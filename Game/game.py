@@ -1,21 +1,21 @@
 import sys, pygame, player, time, TileMap
 pygame.init()
 
-blockSize = 64
-
-width = blockSize * 11
-height = blockSize * 11
+width = 1000
+height = 700
 
 screen = width, height
 black = 0, 0, 0
 
-#flags = pygame.OPENGL | pygame.FULLSCREEN
-#screen = pygame.display.set_mode((1000, 1000), flags)
+blockSize = 64
 
 screen = pygame.display.set_mode(screen)
 
 tm = TileMap.TileMap("HonorsGame\Game\world.txt", blockSize)
-player = player.player(tm)
+for i in range(len(tm.map[0])):
+        for j in range(len(tm.map)):
+            if int(tm.map[j][i]) == 2:
+                player = player.player(tm, i*64, j*64, width, height)
 
 
 while True:
@@ -29,21 +29,17 @@ while True:
         if event.type == pygame.KEYDOWN:
             
             if event.key == pygame.K_w:
-                player.up = True
+                player.jumping = True
             if event.key == pygame.K_a:
                 player.left = True
             if event.key == pygame.K_s:
-                player.down = True
+                player.fastFall = True
             if event.key == pygame.K_d:
                 player.right = True
 
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_w:
-                player.up = False
             if event.key == pygame.K_a:
                 player.left = False
-            if event.key == pygame.K_s:
-                player.down = False
             if event.key == pygame.K_d:
                 player.right = False
 
@@ -51,12 +47,11 @@ while True:
     screen.fill(black)
     for i in range(len(tm.map[0])):
         for j in range(len(tm.map)):
-            #print("j: ", j)
             if int(tm.map[j][i]) == 0:
-                pygame.draw.rect(screen, (0, 0, 0), (64 * i, 64 * j, 64, 64))
-            if int(tm.map[j][i]) == 1:
-                pygame.draw.rect(screen, (210, 180, 140), (64 * i, 64 * j, 64, 64))
-    pygame.draw.rect(screen, (255, 0, 0), (player.x, player.y, player.width, player.height))
+                pygame.draw.rect(screen, (0, 0, 0), (64 * i + tm.x, 64 * j + tm.y, 64, 64))
+            if int(tm.map[j][i]) == 1 or int(tm.map[j][i]) == 2:
+                pygame.draw.rect(screen, (210, 180, 140), (64 * i + tm.x, 64 * j + tm.y, 64, 64))
+    pygame.draw.rect(screen, (255, 0, 0), (player.x + tm.x, player.y + tm.y, player.width, player.height))
     pygame.display.update()
 
         

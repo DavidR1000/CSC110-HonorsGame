@@ -7,8 +7,6 @@ class TileMap:
         self.tileSize = tileSize
 
         name = open(holdName)
-        line = name.readline()
-        self.height = int(line)
 
         self.map = []
     
@@ -19,8 +17,10 @@ class TileMap:
 
         self.smoothScroll = 0.15
 
-        while rowCount < self.height:
+        while True:
             line = name.readline().strip("\n")
+            if len(line) == 0:
+                break
             self.map.append(line.split(" "))
             rowCount += 1
 
