@@ -1,4 +1,4 @@
-import sys, pygame, player, time, TileMap
+import sys, pygame, player, platform, TileMap
 pygame.init()
 
 width = 1000
@@ -9,13 +9,22 @@ black = 0, 0, 0
 
 blockSize = 64
 
+platforms = []
+
 screen = pygame.display.set_mode(screen)
 
 tm = TileMap.TileMap("HonorsGame\Game\world.txt", blockSize)
 for i in range(len(tm.map[0])):
         for j in range(len(tm.map)):
             if int(tm.map[j][i]) == 2:
-                player = player.player(tm, i*64, j*64, width, height)
+                player = player.player(tm, i*blockSize, j*blockSize, width, height)
+                tm.map[j][i] = 1
+
+for i in range(len(tm.map[0])):
+        for j in range(len(tm.map)):
+            if int(tm.map[j][i]) == 3:
+                platforms.append(platform.platform(tm, j, i, player))
+                tm.map[j][i] = 1
 
 
 while True:
@@ -44,13 +53,21 @@ while True:
                 player.right = False
 
     player.update()
+    for i in range(len(platforms)):
+        platforms[i].update()
     screen.fill(black)
     for i in range(len(tm.map[0])):
         for j in range(len(tm.map)):
             if int(tm.map[j][i]) == 0:
-                pygame.draw.rect(screen, (0, 0, 0), (64 * i + tm.x, 64 * j + tm.y, 64, 64))
+                pygame.draw.rect(screen, (0, 0, 0), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
             if int(tm.map[j][i]) == 1 or int(tm.map[j][i]) == 2:
-                pygame.draw.rect(screen, (210, 180, 140), (64 * i + tm.x, 64 * j + tm.y, 64, 64))
+                pygame.draw.rect(screen, (210, 180, 140), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
+            if int(tm.map[j][i]) == 3:
+                pygame.draw.rect(screen, (0, 0, 250), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize/4))
+                pygame.draw.rect(screen, (210, 180, 140), (blockSize * i + tm.x, blockSize * j + tm.y + blockSize/4, blockSize, blockSize*3/4))
+            if int(tm.map[j][i]) == 4:
+                pygame.draw.rect(screen, (0, 250, 0), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize/4))
+                pygame.draw.rect(screen, (210, 180, 140), (blockSize * i + tm.x, blockSize * j + tm.y + blockSize/4, blockSize, blockSize*3/4))
     pygame.draw.rect(screen, (255, 0, 0), (player.x + tm.x, player.y + tm.y, player.width, player.height))
     pygame.display.update()
 

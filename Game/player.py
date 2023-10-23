@@ -3,7 +3,7 @@
 class player:
     
     moveSpeed = 1.2
-    maxSpeed = 4.2
+    maxSpeed = 5.2
     maxFallingSpeed = 12
     stopSpeed = 0.6
     jumpStart = -12.0
@@ -17,11 +17,8 @@ class player:
     fastFall = False
     jumping = False
 
-    x = 100
-    y = 100
-
-    width = 20
-    height = 20
+    width = 16
+    height = 16
 
     dx = 0
     dy = 0  
@@ -29,20 +26,14 @@ class player:
     tempx = 100
     tempy = 100
 
-    gameWidth = 0
-    gameHeight = 0
-
-    xTiles = 0
-    yTiles = 0
-
     def __init__(self, TileMap, startx, starty, width, height):
         self.tileMap = TileMap
         
-        self.x = startx + 15
-        self.y = starty + 15
+        self.x = startx
+        self.y = starty
 
-        self.tempx = startx + 15
-        self.tempy = starty + 15
+        self.tempx = startx
+        self.tempy = starty
 
         self.gameWidth = width
         self.gameHeight = height
@@ -52,15 +43,15 @@ class player:
 
 
     def calculateCorners(self, x, y):
-        leftTile = self.tileMap.getColTile(x // 1)
-        rightTile = self.tileMap.getColTile(((x + 20) // 1) - 1)
-        topTile = self.tileMap.getRowTile(y // 1)
-        bottomTile = self.tileMap.getRowTile(((y + 20) // 1) - 1)
+        leftTile = self.tileMap.getColTile((x) // 1)
+        rightTile = self.tileMap.getColTile(((x + self.width) // 1) - 1)
+        topTile = self.tileMap.getRowTile((y) // 1)
+        bottomTile = self.tileMap.getRowTile(((y + self.height) // 1) - 1)
 
-        self.topLeft = self.tileMap.getTile(topTile, leftTile) == 0
-        self.topRight = self.tileMap.getTile(topTile, rightTile) == 0
-        self.bottomLeft = self.tileMap.getTile(bottomTile, leftTile) == 0
-        self.bottomRight = self.tileMap.getTile(bottomTile, rightTile) == 0
+        self.topLeft = self.tileMap.getTile(topTile, leftTile) == 0 or self.tileMap.getTile(topTile, leftTile) == 4
+        self.topRight = self.tileMap.getTile(topTile, rightTile) == 0 or self.tileMap.getTile(topTile, rightTile) == 4
+        self.bottomLeft = self.tileMap.getTile(bottomTile, leftTile) == 0 or self.tileMap.getTile(bottomTile, leftTile) == 4
+        self.bottomRight = self.tileMap.getTile(bottomTile, rightTile) == 0 or self.tileMap.getTile(bottomTile, rightTile) == 4
 
 
 
@@ -89,7 +80,7 @@ class player:
                 self.dy = 0
                 self.falling = False
                 self.fastFall = False
-                self.tempy = (currRow + 1) * self.tileMap.tileSize - 20
+                self.tempy = (currRow + 1) * self.tileMap.tileSize - self.height
             else:
                 self.tempy += self.dy
     
@@ -105,7 +96,7 @@ class player:
         if self.dx > 0: 
             if self.topRight or self.bottomRight: 
                 self.x = 0
-                self.tempx = (currCol + 1) * self.tileMap.tileSize - 20
+                self.tempx = (currCol + 1) * self.tileMap.tileSize - self.width
             
             else: 
                 self.tempx += self.dx

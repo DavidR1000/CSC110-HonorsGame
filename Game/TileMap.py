@@ -1,5 +1,4 @@
 
-
 class TileMap:
     
     def __init__(self, holdName, tileSize):
@@ -14,6 +13,7 @@ class TileMap:
 
         self.x = 50
         self.y = 50
+        platforms = []
 
         self.smoothScroll = 0.15
 
@@ -23,6 +23,8 @@ class TileMap:
                 break
             self.map.append(line.split(" "))
             rowCount += 1
+
+
 
     def getColTile(self, x):
         return x // self.tileSize
