@@ -186,5 +186,3 @@ class player:
         self.getNextPosition()
         self.checkTileMapCollision()
         self.setPosition()
-
-

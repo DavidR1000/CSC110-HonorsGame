@@ -13,7 +13,6 @@ class TileMap:
 
         self.x = 50
         self.y = 50
-        platforms = []
 
         self.smoothScroll = 0.15
 
