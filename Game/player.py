@@ -29,11 +29,11 @@ class player:
     def __init__(self, TileMap, startx, starty, width, height):
         self.tileMap = TileMap
         
-        self.x = startx
-        self.y = starty
+        self.x = startx + self.tileMap.tileSize/4
+        self.y = starty + self.tileMap.tileSize/4
 
-        self.tempx = startx
-        self.tempy = starty
+        self.tempx = startx + self.tileMap.tileSize/4
+        self.tempy = starty + self.tileMap.tileSize/4
 
         self.gameWidth = width
         self.gameHeight = height
