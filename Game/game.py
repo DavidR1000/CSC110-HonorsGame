@@ -1,7 +1,7 @@
 import sys, pygame, player, platform, TileMap, teleport, button
 pygame.init()
 
-width = 1000
+width = 1024
 height = 700
 
 screen = width, height
@@ -32,11 +32,26 @@ titleText = font.render('Cubeformer', True, (0, 255, 0))
 titleRect = titleText.get_rect()
 titleRect.center = (width/2, height/4)
 
+cText = font.render('Controls', True, (0, 255, 0))
+cRect = cText.get_rect()
+cRect.center = (width/2, height/4)
+
+font = pygame.font.Font('freesansbold.ttf', 120)
+
+winText = font.render('You Won!', True, (0, 255, 0))
+winRect = winText.get_rect()
+winRect.center = (width/2, height/3)
+
+win2Text = font.render('Great Job!', True, (0, 255, 0))
+win2Rect = win2Text.get_rect()
+win2Rect.center = (width/2, height/2)
+
 font = pygame.font.Font('freesansbold.ttf', 32)
 
 play = button.button(width/2, height*5/12, width/4, height/8, (0, 150, 220), (0, 255, 0))
 controls = button.button(width/2, height*7/12, width/4, height/8, (0, 150, 220), (0, 255, 0))
 exit = button.button(width/2, height*9/12, width/4, height/8, (0, 150, 220), (255, 0, 0))
+back = button.button(width/ 6, height*9/11, width/10, height/16, (0, 150, 220), (0, 255, 0))
 
 playText = font.render('Play', True, (255, 0, 0))
 playRect = playText.get_rect()
@@ -47,8 +62,44 @@ controlsRect = controlsText.get_rect()
 controlsRect.center = (controls.x, controls.y)
 
 exitText = font.render('Exit', True, (0, 255, 0))
-exitRect = playText.get_rect()
+exitRect = exitText.get_rect()
 exitRect.center = (exit.x, exit.y)
+
+backText = font.render('Back', True, (255, 0, 0))
+backRect = backText.get_rect()
+backRect.center = (back.x, back.y)
+
+c2Text = font.render('Use A and D to move', True, (0, 150, 220))
+c2Rect = c2Text.get_rect()
+c2Rect.center = (width/4, height*2/5)
+
+c3Text = font.render('Use W to jump', True, (0, 150, 220))
+c3Rect = c3Text.get_rect()
+c3Rect.center = (width*3/4, height*2/5)
+
+c4Text = font.render('This will teleport you', True, (0, 150, 220))
+c4Rect = c4Text.get_rect()
+c4Rect.center = (width*3/4, back.y)
+
+file = open("controlsMap.txt", 'w')
+cols = width//blockSize
+rows = height//blockSize
+words = ''
+for i in range(rows):
+    for j in range(cols):
+        words += '1 '
+    words += '\n'
+file.write(words)
+file.close()
+
+controlsTM = TileMap.TileMap("controlsMap.txt", blockSize)
+for i in range(len(controlsTM.map[7])):
+    controlsTM.map[7][i] = 0
+controlsTM.map[6][0] = 4
+controlsTM.map[5][0] = 4
+controlsTM.map[6][len(controlsTM.map[7])-1] = 4
+controlsTM.map[5][len(controlsTM.map[7])-1] = 4
+playerMove = player.player(controlsTM, 2*blockSize, 6*blockSize, width, height)
 
 for i in range(len(tm.map[0])):
         for j in range(len(tm.map)):
@@ -77,33 +128,49 @@ if portalExist:
 
 while True:
     pygame.time.delay(15)
-
-    if player.x >= gameEndX and player.x + player.width <= gameEndX + tm.tileSize + 1:
-            if player.y >= gameEndY and player.y + player.height <= gameEndY + tm.tileSize:
-                pygame.quit()
-                sys.exit()
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
             pygame.quit()
             sys.exit()
 
-        if event.type == pygame.KEYDOWN:
+        if state == 1:
+        
+            if event.type == pygame.KEYDOWN:
             
-            if event.key == pygame.K_w:
-                player.jumping = True
-            if event.key == pygame.K_a:
-                player.left = True
-            if event.key == pygame.K_s:
-                player.fastFall = True
-            if event.key == pygame.K_d:
-                player.right = True
+                if event.key == pygame.K_w:
+                    playerMove.jumping = True
+                if event.key == pygame.K_a:
+                    playerMove.left = True
+                if event.key == pygame.K_s:
+                    playerMove.fastFall = True
+                if event.key == pygame.K_d:
+                    playerMove.right = True
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_a:
-                player.left = False
-            if event.key == pygame.K_d:
-                player.right = False
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_a:
+                        playerMove.left = False
+                if event.key == pygame.K_d:
+                        playerMove.right = False
+            
+        if state == -1:
+                
+            if event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_w:
+                    player.jumping = True
+                if event.key == pygame.K_a:
+                    player.left = True
+                if event.key == pygame.K_s:
+                    player.fastFall = True
+                if event.key == pygame.K_d:
+                    player.right = True
+
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_a:
+                        player.left = False
+                if event.key == pygame.K_d:
+                        player.right = False
 
     mouse = pygame.mouse.get_pos()
     
@@ -152,8 +219,71 @@ while True:
         screen.blit(controlsText, controlsRect)
         pygame.draw.rect(screen, exit.currentColor, (exit.rightX, exit.topY, exit.width, exit.height))
         screen.blit(exitText, exitRect)
+
     elif state == 1:
-        print("controls")
+        if mouse[0] > back.rightX and mouse[0] < back.rightX + back.width and mouse[1] > back.topY and mouse[1] < back.topY + back.height:
+            back.state = 1
+        else:
+            back.state = 0
+
+        if clickLoc[0] > back.rightX and clickLoc[0] < back.rightX + back.width and clickLoc[1] > back.topY and clickLoc[1] < back.topY + back.height:
+            state = 0
+        
+        back.update()
+        playerMove.update()
+
+        pygame.draw.rect(screen, (0, 0, 0), (0, 0, width, 64))
+        pygame.draw.rect(screen, (0, 0, 0), (0, 0, 64, height))
+        pygame.draw.rect(screen, (0, 0, 0), (0,height - 64, width, 64))
+        pygame.draw.rect(screen, (0, 0, 0), (width - 64, 0, 64, height))
+        pygame.draw.rect(screen, (210, 180, 140), (64, 64, width - 128, height - 128))
+
+        for i in range(len(controlsTM.map[0])):
+            for j in range(len(controlsTM.map)):
+                if int(controlsTM.map[j][i]) == 0:
+                    pygame.draw.rect(screen, (0, 0, 0), (blockSize * i, blockSize * j, blockSize, blockSize))
+        pygame.draw.rect(screen, (255, 0, 0), (playerMove.x, playerMove.y, playerMove.width, playerMove.height))
+
+        pygame.draw.rect(screen, (250, 0, 250), (width*3/4 - 250, back.y - blockSize/2, blockSize, blockSize))
+        pygame.draw.rect(screen, (255, 255, 255), (width*3/4 - 250 + (blockSize/8), back.y - blockSize/2 + (blockSize/8), blockSize*3/4, blockSize*3/4))
+        pygame.draw.rect(screen, (250, 0, 250), (width*3/4 - 250 + (blockSize/4), back.y - blockSize/2 + (blockSize/4), blockSize/2, blockSize/2))
+        pygame.draw.rect(screen, (255, 255, 255), (width*3/4 - 250 + (blockSize*3/8), back.y - blockSize/2 + (blockSize*3/8), blockSize/4, blockSize/4))
+
+        pygame.draw.rect(screen, (92, 64, 51), (width*3/4 - 250, back.y - blockSize/2, blockSize, blockSize))
+        pygame.draw.rect(screen, (255, 255, 255), (width*3/4 - 250 + (blockSize*3/16), back.y - blockSize/2 + (blockSize/4), blockSize*5/8, blockSize*3/4))
+
+        screen.blit(cText, cRect)
+        screen.blit(c2Text, c2Rect)
+        screen.blit(c3Text, c3Rect)
+        screen.blit(c4Text, c4Rect)
+
+        pygame.draw.rect(screen, back.currentColor, (back.rightX, back.topY, back.width, back.height))
+        screen.blit(backText, backRect)
+
+    elif state == 2:
+
+        if mouse[0] > exit.rightX and mouse[0] < exit.rightX + exit.width and mouse[1] > exit.topY and mouse[1] < exit.topY + exit.height:
+            exit.state = 1
+        else:
+            exit.state = 0
+
+        if clickLoc[0] > exit.rightX and clickLoc[0] < exit.rightX + exit.width and clickLoc[1] > exit.topY and clickLoc[1] < exit.topY + exit.height:
+            pygame.quit()
+            sys.exit()
+        
+        exit.update()
+        pygame.draw.rect(screen, (0, 0, 0), (0, 0, width, 64))
+        pygame.draw.rect(screen, (0, 0, 0), (0, 0, 64, height))
+        pygame.draw.rect(screen, (0, 0, 0), (0,height - 64, width, 64))
+        pygame.draw.rect(screen, (0, 0, 0), (width - 64, 0, 64, height))
+        pygame.draw.rect(screen, (210, 180, 140), (64, 64, width - 128, height - 128))
+
+        screen.blit(winText, winRect)
+        screen.blit(win2Text, win2Rect)
+
+        pygame.draw.rect(screen, exit.currentColor, (exit.rightX, exit.topY, exit.width, exit.height))
+        screen.blit(exitText, exitRect)
+
     else:
         player.update()
         for i in range(len(platforms)):
@@ -167,24 +297,25 @@ while True:
                 if int(tm.map[j][i]) == 1:
                     pygame.draw.rect(screen, (210, 180, 140), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
                 if int(tm.map[j][i]) == 2:
-                    pygame.draw.rect(screen, (100, 100, 100), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
+                    pygame.draw.rect(screen, (92, 64, 51), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
+                    pygame.draw.rect(screen, (0), (blockSize * i + tm.x + (tm.tileSize*3/16), blockSize * j + tm.y+ (tm.tileSize/4), blockSize*5/8, blockSize*3/4))
                 if int(tm.map[j][i]) == 5:
-                    pygame.draw.rect(screen, (250, 0, 250), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
-                    pygame.draw.rect(screen, (250, 250, 250), (blockSize * i + tm.x + (tm.tileSize/8), blockSize * j + tm.y + (tm.tileSize/8), blockSize*3/4, blockSize*3/4))
-                    pygame.draw.rect(screen, (250, 0, 250), (blockSize * i + tm.x + (tm.tileSize/4), blockSize * j + tm.y + (tm.tileSize/4), blockSize/2, blockSize/2))
-                    pygame.draw.rect(screen, (250, 250, 250), (blockSize * i + tm.x + (tm.tileSize*3/8), blockSize * j + tm.y + (tm.tileSize*3/8), blockSize/4, blockSize/4))
+                    pygame.draw.rect(screen, (92, 64, 51), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
+                    pygame.draw.rect(screen, (255, 255, 255), (blockSize * i + tm.x + (tm.tileSize*3/16), blockSize * j + tm.y+ (tm.tileSize/4), blockSize*5/8, blockSize*3/4))
                 if int(tm.map[j][i]) == 6:
-                    pygame.draw.rect(screen, (250, 0, 250), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
-                    pygame.draw.rect(screen, (0, 0, 0), (blockSize * i + tm.x + (tm.tileSize/8), blockSize * j + tm.y + (tm.tileSize/8), blockSize*3/4, blockSize*3/4))
-                    pygame.draw.rect(screen, (250, 0, 250), (blockSize * i + tm.x + (tm.tileSize/4), blockSize * j + tm.y + (tm.tileSize/4), blockSize/2, blockSize/2))
-                    pygame.draw.rect(screen, (0, 0, 0), (blockSize * i + tm.x + (tm.tileSize*3/8), blockSize * j + tm.y + (tm.tileSize*3/8), blockSize/4, blockSize/4))
+                    pygame.draw.rect(screen, (92, 64, 51), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
+                    pygame.draw.rect(screen, (0), (blockSize * i + tm.x + (tm.tileSize*3/16), blockSize * j + tm.y+ (tm.tileSize/4), blockSize*5/8, blockSize*3/4))
                 if int(tm.map[j][i]) == 3 or int(tm.map[j][i]) == 4:
                     pygame.draw.rect(screen, (0, 0, 250), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize/4))
                     pygame.draw.rect(screen, (210, 180, 140), (blockSize * i + tm.x, blockSize * j + tm.y + blockSize/4, blockSize, blockSize*3/4))
                 if int(tm.map[j][i]) == 7:
-                    pygame.draw.rect(screen, (0, 255, 0), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
+                    pygame.draw.rect(screen, (92, 64, 51), (blockSize * i + tm.x, blockSize * j + tm.y, blockSize, blockSize))
+                    pygame.draw.rect(screen, (255, 255, 255), (blockSize * i + tm.x + (tm.tileSize*3/16), blockSize * j + tm.y+ (tm.tileSize/4), blockSize*5/8, blockSize*3/4))
         pygame.draw.rect(screen, (255, 0, 0), (player.x + tm.x, player.y + tm.y, player.width, player.height))
-    
+        if player.x >= gameEndX and player.x + player.width <= gameEndX + tm.tileSize + 1:
+            if player.y >= gameEndY and player.y + player.height <= gameEndY + tm.tileSize:
+                state = 2
+
     pygame.display.update()
 
         

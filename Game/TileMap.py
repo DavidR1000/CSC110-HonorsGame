@@ -17,7 +17,7 @@ class TileMap:
         self.smoothScroll = 0.15
 
         while True:
-            line = name.readline().strip("\n")
+            line = name.readline().strip()
             if len(line) == 0:
                 break
             self.map.append(line.split(" "))
