@@ -1,7 +1,12 @@
-
+'''
+This class is called in the main game class
+and has all the properties of the player
+and controls movement of the character
+'''
 
 class player:
-    
+    # Basic movement properties used to create
+    # movement and gravity
     moveSpeed = 1.2
     maxSpeed = 5.2
     maxFallingSpeed = 12
@@ -27,6 +32,10 @@ class player:
     tempy = 100
 
     def __init__(self, TileMap, startx, starty, width, height):
+        '''
+        This function gives the player class information of the
+        actual game map and the screen properties
+        '''
         self.tileMap = TileMap
         
         self.x = startx + self.tileMap.tileSize/4
@@ -43,6 +52,9 @@ class player:
 
 
     def calculateCorners(self, x, y):
+        '''
+        This function checks the 4 tiles on the screen around the player to check if they are solid blocks
+        '''
         leftTile = self.tileMap.getColTile((x) // 1)
         rightTile = self.tileMap.getColTile(((x + self.width) // 1) - 1)
         topTile = self.tileMap.getRowTile((y) // 1)
@@ -57,6 +69,9 @@ class player:
 
 
     def checkTileMapCollision(self):
+        '''
+        This function checks collisions for player to ensure it is moving to an open tile
+        '''
         currCol = self.tileMap.getColTile(self.x // 1)
         currRow = self.tileMap.getRowTile(self.y // 1)
 
@@ -109,11 +124,20 @@ class player:
 
 
     def setPosition(self):
+        '''
+        This function sets the players next location based on the results of
+        collision detection function
+        '''
         self.x = self.tempx
         self.y = self.tempy
 
 
     def getNextPosition(self):
+        '''
+        This gets the next accepteable position for the player
+        based on the user's input and depending on the results of the
+        collision detection
+        '''
         if self.right:
             self.dx += self.moveSpeed
             if self.dx > self.maxSpeed:
@@ -183,6 +207,11 @@ class player:
 
 
     def update(self):
+        '''
+        This function updates charcters location by checking the see the next position for 
+        the character based on user input and then ensures the desired location is open and then moves
+        the player to the next acceptable location
+        '''
         self.getNextPosition()
         self.checkTileMapCollision()
         self.setPosition()

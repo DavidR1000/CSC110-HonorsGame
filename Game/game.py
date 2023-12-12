@@ -1,6 +1,7 @@
 import sys, pygame, player, platform, TileMap, teleport, button
 pygame.init()
 
+# Varaibles used in the implementation of the game
 width = 1024
 height = 700
 
@@ -22,10 +23,11 @@ clickLoc = (0, 0)
 
 screen = pygame.display.set_mode(screen)
 
-tm = TileMap.TileMap("HonorsGame\Game\world.txt", blockSize)
+tm = TileMap.TileMap("world.txt", blockSize)
 
 pygame.display.set_caption("Cubeformer")
 
+# All text used in the game
 font = pygame.font.Font('freesansbold.ttf', 80)
 
 titleText = font.render('Cubeformer', True, (0, 255, 0))
@@ -81,6 +83,7 @@ c4Text = font.render('This will teleport you', True, (0, 150, 220))
 c4Rect = c4Text.get_rect()
 c4Rect.center = (width*3/4, back.y)
 
+# Creates map to be used inside of the controls button
 file = open("controlsMap.txt", 'w')
 cols = width//blockSize
 rows = height//blockSize
@@ -101,6 +104,7 @@ controlsTM.map[6][len(controlsTM.map[7])-1] = 4
 controlsTM.map[5][len(controlsTM.map[7])-1] = 4
 playerMove = player.player(controlsTM, 2*blockSize, 6*blockSize, width, height)
 
+# Creates actual map being used in game
 for i in range(len(tm.map[0])):
         for j in range(len(tm.map)):
             if int(tm.map[j][i]) == 2:
@@ -125,7 +129,7 @@ if portalExist:
                     portal.endX = i * tm.tileSize
                     portal.endY = j * tm.tileSize
 
-
+# Runs game forever until quit
 while True:
     pygame.time.delay(15)
     
@@ -135,7 +139,7 @@ while True:
             sys.exit()
 
         if state == 1:
-        
+            # Checks player's movement in controls button
             if event.type == pygame.KEYDOWN:
             
                 if event.key == pygame.K_w:
@@ -154,7 +158,7 @@ while True:
                         playerMove.right = False
             
         if state == -1:
-                
+            # Checks player's movement in game
             if event.type == pygame.KEYDOWN:
 
                 if event.key == pygame.K_w:
@@ -175,11 +179,11 @@ while True:
     mouse = pygame.mouse.get_pos()
     
     mouseClicks = pygame.mouse.get_pressed(num_buttons = 3)
-    
+    # Checks mouse clicks to see what screen to show based on button pressed
     for press in mouseClicks:
          if press:
             clickLoc = pygame.mouse.get_pos()
-
+    # Start screen
     if state == 0:
         if mouse[0] > play.rightX and mouse[0] < play.rightX + play.width and mouse[1] > play.topY and mouse[1] < play.topY + play.height:
             play.state = 1
@@ -219,7 +223,7 @@ while True:
         screen.blit(controlsText, controlsRect)
         pygame.draw.rect(screen, exit.currentColor, (exit.rightX, exit.topY, exit.width, exit.height))
         screen.blit(exitText, exitRect)
-
+    # Controls screen
     elif state == 1:
         if mouse[0] > back.rightX and mouse[0] < back.rightX + back.width and mouse[1] > back.topY and mouse[1] < back.topY + back.height:
             back.state = 1
@@ -259,7 +263,7 @@ while True:
 
         pygame.draw.rect(screen, back.currentColor, (back.rightX, back.topY, back.width, back.height))
         screen.blit(backText, backRect)
-
+    # End Screen
     elif state == 2:
 
         if mouse[0] > exit.rightX and mouse[0] < exit.rightX + exit.width and mouse[1] > exit.topY and mouse[1] < exit.topY + exit.height:
@@ -283,7 +287,7 @@ while True:
 
         pygame.draw.rect(screen, exit.currentColor, (exit.rightX, exit.topY, exit.width, exit.height))
         screen.blit(exitText, exitRect)
-
+    # Game screen
     else:
         player.update()
         for i in range(len(platforms)):
